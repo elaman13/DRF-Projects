@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, filters
 from rest_framework.viewsets import ModelViewSet
 from .serializers import SignUpSerializer, PostSerializer, LikeSerializer, CommentSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -18,6 +18,9 @@ class PostView(ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = PostPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title', 'author__username']
+
 
     def perform_create(self, serializer):
         return serializer.save(author=self.request.user)
@@ -75,3 +78,11 @@ class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id', None))
         return post.comments.all()
             
+class FeedView(generics.ListAPIView):
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        following = self.request.user.following.all()
+        following_posts = Post.objects.filter(author__in=following)
+
+        return following_posts.all()

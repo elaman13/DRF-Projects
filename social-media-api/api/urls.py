@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import SignUpView, PostView, CommentView, CommentDetailView
+from .views import SignUpView, PostView, CommentView, CommentDetailView, FeedView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.routers import DefaultRouter
 
@@ -14,6 +14,7 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='refresh'),
     path('', include(router.urls)),
     path('posts/<int:pk>/comments/', CommentView.as_view(), name='comment'),
-    path('posts/<int:post_id>/comments/<int:pk>/', CommentDetailView.as_view(), name='comment-detail')
+    path('posts/<int:post_id>/comments/<int:pk>/', CommentDetailView.as_view(), name='comment-detail'),
+    path('feeds/', FeedView.as_view(), name='feeds')
 ]
 
