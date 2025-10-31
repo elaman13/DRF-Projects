@@ -12,9 +12,17 @@ class CustomUser(AbstractUser):
 User = settings.AUTH_USER_MODEL
 
 class Post(models.Model):
+    VISIBILITY_CHOICES = [
+        ('public', 'Public'),
+        ('private', 'Private'),
+        ('friends', 'Friends')
+    ]
+
     title = models.CharField(max_length=255)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    visible = models.CharField(choices=VISIBILITY_CHOICES, max_length=10, default='public')
+
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
