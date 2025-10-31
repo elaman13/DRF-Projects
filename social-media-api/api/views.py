@@ -27,21 +27,24 @@ class PostView(ModelViewSet):
         user = self.request.user
         return Post.objects.filter(author=user).order_by('created_at')
     
-    @action(detail=True, methods=['get', 'post'])
-    def like(self, request, pk):
-        if request.method == 'GET':
-            like =  self.get_object()
-            serializer = LikeSerializer(like.likes.all(), many=True)
-            print(serializer.data)
-            return Response(serializer.data)
-        
-        elif request.method == 'POST':
-            post =  self.get_object()
-            liked, is_liked = Like.objects.get_or_create(user=request.user, post=post)
-            print(f'liked: {liked}, is_liked: {is_liked}')
 
-            return Response({"detail": f"{request.user.username} liked you're video" if is_liked else f"You already liked it."})
+    @action(detail=True, methods=['get'])
+    def likes(self, request, pk):
+        post =  self.get_object()
+        likes = post.likes.all()
+        serializer = LikeSerializer(likes, many=True)
+        return Response(serializer.data)
+        
+
+    @action(detail=True, methods=['post'])
+    def like(self, request, pk):
+        post =  self.get_object()
+        liked, is_liked = Like.objects.get_or_create(user=request.user, post=post)
+        print(f'liked: {liked}, is_liked: {is_liked}')
+
+        return Response({"detail": f"{request.user.username} liked you're video" if is_liked else f"You already liked it."})
     
+
     @action(detail=True, methods=['post'])
     def dislike(self, request, pk):  
         post =  self.get_object()

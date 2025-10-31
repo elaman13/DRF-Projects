@@ -13,14 +13,6 @@ class SignUpSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
 
-
-class PostSerializer(serializers.ModelSerializer):
-    author = serializers.ReadOnlyField(source='author.username')
-
-    class Meta:
-        model = Post
-        fields = ['id', 'author', 'title', 'content', 'created_at']
-
 class LikeSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
 
@@ -35,3 +27,12 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = '__all__'
+
+class PostSerializer(serializers.ModelSerializer):
+    comments = CommentSerializer(read_only=True, many=True)
+    likes = LikeSerializer(read_only=True, many=True)
+    author = serializers.ReadOnlyField(source='author.username')
+
+    class Meta:
+        model = Post
+        fields = ['id', 'author', 'title', 'content', 'created_at', 'likes', 'comments']
