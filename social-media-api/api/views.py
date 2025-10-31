@@ -6,6 +6,7 @@ from app.models import Post, Like
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from .paginations import PostPagination
 
 
 class SignUpView(generics.CreateAPIView):
@@ -16,6 +17,7 @@ class SignUpView(generics.CreateAPIView):
 class PostView(ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = PostPagination
 
     def perform_create(self, serializer):
         return serializer.save(author=self.request.user)
@@ -23,7 +25,7 @@ class PostView(ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return Post.objects.filter(author=user)
+        return Post.objects.filter(author=user).order_by('created_at')
     
     @action(detail=True, methods=['get', 'post'])
     def like(self, request, pk):
